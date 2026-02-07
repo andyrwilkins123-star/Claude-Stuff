@@ -87,12 +87,46 @@
             color: #666;
             margin-top: 1rem;
         }
+        .table-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .table-btn {
+            width: 42px;
+            height: 42px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            background: white;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #333;
+            transition: all 0.15s;
+        }
+        .table-btn:hover {
+            border-color: #4a90d9;
+            background: #e8f0fe;
+        }
+        .table-btn.selected {
+            border-color: #4a90d9;
+            background: #4a90d9;
+            color: white;
+        }
+        .picker-label {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
     </style>
 </head>
 <body>
 
     <div class="quiz-container">
         <h2>Times Table Quiz</h2>
+        <div class="picker-label">Pick tables to practice (or leave all off for random):</div>
+        <div class="table-picker" id="tablePicker"></div>
         <div class="question" id="question"></div>
         <div>
             <input type="number" id="answer" class="answer-input" autofocus>
@@ -109,10 +143,47 @@
         let a, b;
         let correctCount = 0;
         let totalCount = 0;
+        const selectedTables = new Set();
+
+        // Build table picker buttons 1–12
+        const picker = document.getElementById('tablePicker');
+        for (let i = 1; i <= 12; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'table-btn';
+            btn.textContent = i;
+            btn.addEventListener('click', function() {
+                if (selectedTables.has(i)) {
+                    selectedTables.delete(i);
+                    btn.classList.remove('selected');
+                } else {
+                    selectedTables.add(i);
+                    btn.classList.add('selected');
+                }
+                resetScore();
+                newQuestion();
+            });
+            picker.appendChild(btn);
+        }
+
+        function resetScore() {
+            correctCount = 0;
+            totalCount = 0;
+            document.getElementById('score').textContent = 'Score: 0 / 0';
+        }
+
+        function randomFromSet() {
+            const arr = Array.from(selectedTables);
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
 
         function newQuestion() {
-            a = Math.floor(Math.random() * 12) + 1;
-            b = Math.floor(Math.random() * 12) + 1;
+            if (selectedTables.size > 0) {
+                a = randomFromSet();
+                b = Math.floor(Math.random() * 12) + 1;
+            } else {
+                a = Math.floor(Math.random() * 12) + 1;
+                b = Math.floor(Math.random() * 12) + 1;
+            }
             document.getElementById('question').textContent = a + ' × ' + b + ' = ?';
             document.getElementById('answer').value = '';
             document.getElementById('feedback').textContent = '';
