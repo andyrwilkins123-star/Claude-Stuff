@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Venn Diagram Notation - KS3 Maths</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #4f46e5;
+    --primary-light: #818cf8;
+    --primary-bg: #eef2ff;
+    --success: #16a34a;
+    --success-bg: #dcfce7;
+    --error: #dc2626;
+    --error-bg: #fee2e2;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    color: white;
+    padding: 1.25rem 2rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  header h1 { font-size: 1.6rem; font-weight: 700; }
+  header p { font-size: 0.95rem; opacity: 0.9; margin-top: 0.25rem; }
+
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+    background: var(--gray-100);
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--gray-200);
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 0.55rem 1.2rem;
+    border: none;
+    background: transparent;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { background: white; color: var(--gray-700); }
+  .tab-btn.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-weight: 600;
+  }
+
+  main { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid var(--gray-200);
+  }
+  .card h2 { font-size: 1.25rem; margin-bottom: 0.75rem; color: var(--primary); }
+  .card h3 { font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--gray-700); }
+  .card p { color: var(--gray-700); margin-bottom: 0.5rem; }
+
+  .venn-container { display: flex; justify-content: center; margin: 1rem 0; }
+  .venn-container svg { max-width: 100%; height: auto; }
+
+  .notation-table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.92rem; }
+  .notation-table th, .notation-table td { padding: 0.6rem 0.75rem; text-align: left; border-bottom: 1px solid var(--gray-200); }
+  .notation-table th { background: var(--primary-bg); font-weight: 600; color: var(--primary); }
+  .notation-table tr:hover { background: var(--gray-50); }
+  .notation-symbol { font-size: 1.3rem; font-weight: 700; color: var(--primary); text-align: center !important; width: 60px; }
+
+  .explore-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
+  @media (max-width: 640px) { .explore-grid { grid-template-columns: 1fr; } }
+
+  .region-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .region-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--gray-300);
+    background: white;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .region-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .region-btn.active { border-color: var(--primary); background: var(--primary-bg); color: var(--primary); }
+
+  .description-box {
+    background: var(--primary-bg);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    min-height: 80px;
+    margin-top: 0.75rem;
+  }
+  .description-box .notation-display { font-size: 1.6rem; font-weight: 700; color: var(--primary); }
+  .description-box .notation-desc { color: var(--gray-700); margin-top: 0.25rem; }
+
+  .quiz-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+  .score-display { font-weight: 600; color: var(--primary); font-size: 1rem; }
+  .streak-display { font-size: 0.85rem; color: var(--gray-500); }
+
+  .quiz-question { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--gray-900); }
+  .quiz-prompt {
+    font-size: 1.5rem; font-weight: 700; color: var(--primary);
+    margin-bottom: 1rem; text-align: center; padding: 0.75rem;
+    background: var(--primary-bg); border-radius: 0.75rem;
+  }
+  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1rem; }
+  @media (max-width: 480px) { .quiz-options { grid-template-columns: 1fr; } }
+
+  .quiz-option {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--gray-200);
+    background: white;
+    border-radius: 0.65rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .quiz-option:hover:not(.disabled) { border-color: var(--primary-light); background: var(--primary-bg); }
+  .quiz-option.correct { border-color: var(--success); background: var(--success-bg); color: var(--success); }
+  .quiz-option.incorrect { border-color: var(--error); background: var(--error-bg); color: var(--error); }
+  .quiz-option.disabled { cursor: default; opacity: 0.7; }
+  .quiz-option.show-correct { border-color: var(--success); background: var(--success-bg); }
+
+  .quiz-feedback {
+    padding: 0.75rem 1rem; border-radius: 0.65rem; font-weight: 500;
+    text-align: center; margin-bottom: 0.75rem; display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: var(--success-bg); color: var(--success); }
+  .quiz-feedback.incorrect { background: var(--error-bg); color: var(--error); }
+
+  .next-btn, .start-btn {
+    display: block; margin: 0 auto; padding: 0.65rem 2rem;
+    background: var(--primary); color: white; border: none;
+    border-radius: 0.5rem; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .next-btn:hover, .start-btn:hover { background: #4338ca; }
+  .next-btn:disabled { background: var(--gray-300); cursor: default; }
+
+  .quiz-mode-selector { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .quiz-mode-btn {
+    padding: 0.4rem 0.9rem; border: 2px solid var(--gray-200); background: white;
+    border-radius: 2rem; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.2s;
+  }
+  .quiz-mode-btn:hover { border-color: var(--primary-light); }
+  .quiz-mode-btn.active { border-color: var(--primary); background: var(--primary-bg); color: var(--primary); }
+
+  .progress-bar-container { background: var(--gray-200); border-radius: 1rem; height: 10px; overflow: hidden; margin-bottom: 1rem; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), #7c3aed); border-radius: 1rem; transition: width 0.4s ease; width: 0%; }
+
+  .click-instruction { text-align: center; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--gray-700); }
+  .click-instruction .target-notation { font-size: 1.4rem; color: var(--primary); font-weight: 700; }
+
+  .venn-region { cursor: pointer; transition: opacity 0.2s; }
+  .venn-region:hover { opacity: 0.85; }
+
+  .results-card { text-align: center; padding: 2rem; }
+  .results-card .score-big { font-size: 3rem; font-weight: 800; color: var(--primary); }
+  .results-card .score-label { font-size: 1.1rem; color: var(--gray-500); margin-bottom: 1rem; }
+  .results-card .results-message { font-size: 1.15rem; font-weight: 600; margin-bottom: 1.5rem; }
+
+  .example-box {
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-radius: 0.75rem; padding: 1rem; margin: 0.75rem 0;
+  }
+  .example-box .example-title { font-weight: 600; color: var(--primary); margin-bottom: 0.25rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Venn Diagram Notation</h1>
+  <p>Interactive learning for KS3 Maths</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="learn">Learn</button>
+  <button class="tab-btn" data-tab="explore">Explore</button>
+  <button class="tab-btn" data-tab="quiz">Quiz</button>
+  <button class="tab-btn" data-tab="challenge">Challenge</button>
+</nav>
+
+<main>
+
+<!-- LEARN SECTION -->
+<div id="learn" class="section active">
+  <div class="card">
+    <h2>What is a Venn Diagram?</h2>
+    <p>A Venn diagram uses overlapping circles inside a rectangle to show relationships between sets. Each circle represents a set, and the rectangle represents the <strong>universal set</strong> (everything we are considering).</p>
+    <div class="venn-container" id="learn-venn-intro"></div>
+    <p>Circle <strong style="color:#3b82f6">A</strong> (blue) and circle <strong style="color:#ef4444">B</strong> (red) overlap in the middle. The rectangle is the universal set, written as <strong>&#x03BE;</strong> (the Greek letter "xi").</p>
+  </div>
+
+  <div class="card">
+    <h2>Key Notation</h2>
+    <table class="notation-table">
+      <thead><tr><th>Symbol</th><th>Name</th><th>Meaning</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td class="notation-symbol">&#x03BE;</td><td><strong>Universal set</strong></td><td>Everything under consideration</td><td>All students in Year 8</td></tr>
+        <tr><td class="notation-symbol">&cap;</td><td><strong>Intersection</strong></td><td>In <em>both</em> sets (AND)</td><td>A &cap; B = play football AND tennis</td></tr>
+        <tr><td class="notation-symbol">&cup;</td><td><strong>Union</strong></td><td>In <em>either or both</em> sets (OR)</td><td>A &cup; B = play football OR tennis (or both)</td></tr>
+        <tr><td class="notation-symbol">A'</td><td><strong>Complement</strong></td><td>Everything <em>not</em> in the set</td><td>A' = do NOT play football</td></tr>
+        <tr><td class="notation-symbol">&empty;</td><td><strong>Empty set</strong></td><td>A set with nothing in it</td><td>If no one plays both, A &cap; B = &empty;</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Combining Notation</h2>
+    <p>You can combine these symbols to describe more specific regions:</p>
+    <table class="notation-table">
+      <thead><tr><th>Notation</th><th>Meaning</th><th>Region</th></tr></thead>
+      <tbody>
+        <tr><td class="notation-symbol">A &cap; B'</td><td>In A but NOT in B</td><td>The part of circle A that doesn't overlap</td></tr>
+        <tr><td class="notation-symbol">A' &cap; B</td><td>In B but NOT in A</td><td>The part of circle B that doesn't overlap</td></tr>
+        <tr><td class="notation-symbol">(A &cup; B)'</td><td>Not in A and not in B</td><td>Outside both circles</td></tr>
+        <tr><td class="notation-symbol">(A &cap; B)'</td><td>Not in both A and B</td><td>Everything except the overlap</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Worked Example</h2>
+    <div class="example-box">
+      <div class="example-title">Year 8 Sports Survey</div>
+      <p><strong>&#x03BE;</strong> = {all 30 students in 8C}</p>
+      <p><strong>A</strong> = {students who play football} &nbsp; <strong>B</strong> = {students who play tennis}</p>
+    </div>
+    <div class="venn-container" id="learn-venn-example"></div>
+    <div class="example-box">
+      <p><strong>A &cap; B</strong> = {students playing both} = <strong>5</strong> students</p>
+      <p><strong>A &cup; B</strong> = {students playing at least one sport} = 12 + 5 + 8 = <strong>25</strong> students</p>
+      <p><strong>A'</strong> = {students NOT playing football} = 8 + 5 = <strong>13</strong> students</p>
+      <p><strong>(A &cup; B)'</strong> = {students playing neither} = <strong>5</strong> students (outside both circles)</p>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:1rem;">
+    <button class="start-btn" onclick="switchTab('explore')">Try the Explorer &rarr;</button>
+  </div>
+</div>
+
+<!-- EXPLORE SECTION -->
+<div id="explore" class="section">
+  <div class="card">
+    <h2>Interactive Explorer</h2>
+    <p>Click a notation below to see which region it refers to on the Venn diagram.</p>
+    <div class="explore-grid">
+      <div>
+        <div class="venn-container" id="explore-venn"></div>
+      </div>
+      <div>
+        <h3>Select a notation:</h3>
+        <div class="region-buttons" id="explore-buttons">
+          <button class="region-btn" data-region="A">A</button>
+          <button class="region-btn" data-region="B">B</button>
+          <button class="region-btn" data-region="AinterB">A &cap; B</button>
+          <button class="region-btn" data-region="AunionB">A &cup; B</button>
+          <button class="region-btn" data-region="Acomp">A'</button>
+          <button class="region-btn" data-region="Bcomp">B'</button>
+          <button class="region-btn" data-region="AinterBcomp">A &cap; B'</button>
+          <button class="region-btn" data-region="AcompinterB">A' &cap; B</button>
+          <button class="region-btn" data-region="AunionBcomp">(A &cup; B)'</button>
+          <button class="region-btn" data-region="AinterBcompBig">(A &cap; B)'</button>
+        </div>
+        <div class="description-box" id="explore-description">
+          <div class="notation-display" id="explore-notation">Click a button</div>
+          <div class="notation-desc" id="explore-desc">Select a notation to see which region lights up on the Venn diagram.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top:1rem;">
+    <button class="start-btn" onclick="switchTab('quiz')">Test Yourself &rarr;</button>
+  </div>
+</div>
+
+<!-- QUIZ SECTION -->
+<div id="quiz" class="section">
+  <div class="card">
+    <h2>Quick Quiz</h2>
+    <p>Choose the correct notation for the shaded region, or identify the shaded region from the notation.</p>
+    <div class="quiz-mode-selector" id="quiz-mode-selector">
+      <button class="quiz-mode-btn active" data-mode="shaded-to-notation">Shading &rarr; Notation</button>
+      <button class="quiz-mode-btn" data-mode="notation-to-shading">Notation &rarr; Shading</button>
+      <button class="quiz-mode-btn" data-mode="mixed">Mixed</button>
+    </div>
+    <div class="quiz-header">
+      <span class="score-display" id="quiz-score">Score: 0 / 0</span>
+      <span class="streak-display" id="quiz-streak"></span>
+    </div>
+    <div class="progress-bar-container"><div class="progress-bar" id="quiz-progress"></div></div>
+    <div id="quiz-content"></div>
+  </div>
+</div>
+
+<!-- CHALLENGE SECTION -->
+<div id="challenge" class="section">
+  <div class="card">
+    <h2>Click the Region Challenge</h2>
+    <p>Click directly on the correct region of the Venn diagram!</p>
+    <div class="quiz-header">
+      <span class="score-display" id="challenge-score">Score: 0 / 0</span>
+      <span class="streak-display" id="challenge-streak"></span>
+    </div>
+    <div class="progress-bar-container"><div class="progress-bar" id="challenge-progress"></div></div>
+    <div id="challenge-content">
+      <div class="click-instruction">
+        Click the region that represents:<br>
+        <span class="target-notation" id="challenge-target"></span>
+      </div>
+      <div class="venn-container" id="challenge-venn"></div>
+      <div class="quiz-feedback" id="challenge-feedback"></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ============ SVG VENN DIAGRAM BUILDER ============
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function createVennSVG(containerId, opts = {}) {
+  const {
+    width = 380, height = 260,
+    showLabels = true, showNumbers = false, numbers = {},
+    interactive = false, onClick = null,
+    id = containerId
+  } = opts;
+
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.setAttribute("width", width);
+  svg.setAttribute("height", height);
+  svg.id = id + "-svg";
+
+  const cx1 = width * 0.38, cx2 = width * 0.62, cy = height * 0.5, r = height * 0.36;
+  const midX = (cx1 + cx2) / 2;
+  const halfDist = (cx2 - cx1) / 2;
+  const hh = Math.sqrt(r * r - halfDist * halfDist);
+  const pTop = { x: midX, y: cy - hh };
+  const pBot = { x: midX, y: cy + hh };
+
+  const intersectionPath = `M ${pTop.x} ${pTop.y} A ${r} ${r} 0 0 1 ${pBot.x} ${pBot.y} A ${r} ${r} 0 0 1 ${pTop.x} ${pTop.y} Z`;
+
+  // Universal set rectangle
+  const rect = document.createElementNS(SVG_NS, "rect");
+  rect.setAttribute("x", 5); rect.setAttribute("y", 5);
+  rect.setAttribute("width", width - 10); rect.setAttribute("height", height - 10);
+  rect.setAttribute("rx", 12);
+  rect.setAttribute("fill", "#fafafa"); rect.setAttribute("stroke", "#999"); rect.setAttribute("stroke-width", 1.5);
+  rect.dataset.region = "outside";
+  if (interactive) {
+    rect.classList.add("venn-region");
+    rect.addEventListener("click", () => onClick && onClick("outside"));
+  }
+  svg.appendChild(rect);
+
+  // Circle A
+  const circleA = document.createElementNS(SVG_NS, "circle");
+  circleA.setAttribute("cx", cx1); circleA.setAttribute("cy", cy); circleA.setAttribute("r", r);
+  circleA.setAttribute("fill", "rgba(59,130,246,0.18)");
+  circleA.setAttribute("stroke", "#3b82f6"); circleA.setAttribute("stroke-width", 2);
+  circleA.id = id + "-circleA";
+  svg.appendChild(circleA);
+
+  // Circle B
+  const circleB = document.createElementNS(SVG_NS, "circle");
+  circleB.setAttribute("cx", cx2); circleB.setAttribute("cy", cy); circleB.setAttribute("r", r);
+  circleB.setAttribute("fill", "rgba(239,68,68,0.18)");
+  circleB.setAttribute("stroke", "#ef4444"); circleB.setAttribute("stroke-width", 2);
+  circleB.id = id + "-circleB";
+  svg.appendChild(circleB);
+
+  // Intersection (lens)
+  const inter = document.createElementNS(SVG_NS, "path");
+  inter.setAttribute("d", intersectionPath);
+  inter.setAttribute("fill", "rgba(149,99,180,0.22)");
+  inter.setAttribute("stroke", "none");
+  inter.id = id + "-intersection";
+  inter.dataset.region = "intersection";
+  if (interactive) {
+    inter.classList.add("venn-region");
+    inter.addEventListener("click", (e) => { e.stopPropagation(); onClick && onClick("intersection"); });
+  }
+  svg.appendChild(inter);
+
+  // Interactive hit areas
+  if (interactive) {
+    const aHit = document.createElementNS(SVG_NS, "circle");
+    aHit.setAttribute("cx", cx1); aHit.setAttribute("cy", cy); aHit.setAttribute("r", r);
+    aHit.setAttribute("fill", "transparent");
+    aHit.dataset.region = "aOnly";
+    aHit.classList.add("venn-region");
+    aHit.addEventListener("click", (e) => { e.stopPropagation(); onClick && onClick("aOnly"); });
+    svg.appendChild(aHit);
+
+    const bHit = document.createElementNS(SVG_NS, "circle");
+    bHit.setAttribute("cx", cx2); bHit.setAttribute("cy", cy); bHit.setAttribute("r", r);
+    bHit.setAttribute("fill", "transparent");
+    bHit.dataset.region = "bOnly";
+    bHit.classList.add("venn-region");
+    bHit.addEventListener("click", (e) => { e.stopPropagation(); onClick && onClick("bOnly"); });
+    svg.appendChild(bHit);
+
+    // Intersection on top to capture overlap clicks
+    const interHit = document.createElementNS(SVG_NS, "path");
+    interHit.setAttribute("d", intersectionPath);
+    interHit.setAttribute("fill", "transparent");
+    interHit.dataset.region = "intersection";
+    interHit.classList.add("venn-region");
+    interHit.addEventListener("click", (e) => { e.stopPropagation(); onClick && onClick("intersection"); });
+    svg.appendChild(interHit);
+  }
+
+  // Labels
+  if (showLabels) {
+    const addText = (x, y, text, size, color, weight) => {
+      const t = document.createElementNS(SVG_NS, "text");
+      t.setAttribute("x", x); t.setAttribute("y", y);
+      t.setAttribute("text-anchor", "middle"); t.setAttribute("dominant-baseline", "middle");
+      t.setAttribute("font-size", size); t.setAttribute("fill", color);
+      t.setAttribute("font-weight", weight); t.setAttribute("font-family", "inherit");
+      t.textContent = text;
+      svg.appendChild(t);
+    };
+    addText(cx1 - r * 0.45, cy - r - 14, "A", 18, "#3b82f6", "700");
+    addText(cx2 + r * 0.45, cy - r - 14, "B", 18, "#ef4444", "700");
+    addText(width - 22, 22, "\u03BE", 18, "#666", "700");
+  }
+
+  // Numbers
+  if (showNumbers) {
+    const addNum = (x, y, text) => {
+      const t = document.createElementNS(SVG_NS, "text");
+      t.setAttribute("x", x); t.setAttribute("y", y);
+      t.setAttribute("text-anchor", "middle"); t.setAttribute("dominant-baseline", "middle");
+      t.setAttribute("font-size", 22); t.setAttribute("fill", "#1e293b");
+      t.setAttribute("font-weight", "800"); t.setAttribute("font-family", "inherit");
+      t.textContent = text;
+      svg.appendChild(t);
+    };
+    addNum(cx1 - halfDist * 0.7, cy, numbers.aOnly || "");
+    addNum(midX, cy, numbers.intersection || "");
+    addNum(cx2 + halfDist * 0.7, cy, numbers.bOnly || "");
+    addNum(width - 40, height - 28, numbers.outside || "");
+  }
+
+  svg._venn = { cx1, cx2, cy, r, midX, halfDist, hh, pTop, pBot, intersectionPath, width, height };
+  document.getElementById(containerId).appendChild(svg);
+  return svg;
+}
+
+// ============ HIGHLIGHTING ============
+function highlightByNotation(svg, notation) {
+  const regionMap = {
+    "A": ["aOnly", "intersection"],
+    "B": ["bOnly", "intersection"],
+    "AinterB": ["intersection"],
+    "AunionB": ["aOnly", "bOnly", "intersection"],
+    "Acomp": ["bOnly", "outside"],
+    "Bcomp": ["aOnly", "outside"],
+    "AinterBcomp": ["aOnly"],
+    "AcompinterB": ["bOnly"],
+    "AunionBcomp": ["outside"],
+    "AinterBcompBig": ["aOnly", "bOnly", "outside"],
+  };
+  const regions = new Set(regionMap[notation] || []);
+  const id = svg.id.replace("-svg", "");
+  const circleA = svg.querySelector("#" + id + "-circleA");
+  const circleB = svg.querySelector("#" + id + "-circleB");
+  const inter = svg.querySelector("#" + id + "-intersection");
+  const rect = svg.querySelector("rect");
+
+  // Active colours
+  circleA.setAttribute("fill", regions.has("aOnly") ? "rgba(59,130,246,0.5)" : "rgba(59,130,246,0.07)");
+  circleB.setAttribute("fill", regions.has("bOnly") ? "rgba(239,68,68,0.5)" : "rgba(239,68,68,0.07)");
+  inter.setAttribute("fill", regions.has("intersection") ? "rgba(149,99,180,0.6)" : "rgba(149,99,180,0.07)");
+  rect.setAttribute("fill", regions.has("outside") ? "rgba(200,200,200,0.4)" : "#fafafa");
+}
+
+function resetHighlight(svg) {
+  const id = svg.id.replace("-svg", "");
+  svg.querySelector("#" + id + "-circleA").setAttribute("fill", "rgba(59,130,246,0.18)");
+  svg.querySelector("#" + id + "-circleB").setAttribute("fill", "rgba(239,68,68,0.18)");
+  svg.querySelector("#" + id + "-intersection").setAttribute("fill", "rgba(149,99,180,0.22)");
+  svg.querySelector("rect").setAttribute("fill", "#fafafa");
+}
+
+// ============ NOTATION DATA ============
+const notationInfo = {
+  "A":              { symbol: "A",           desc: "Everything inside circle A (including the overlap with B)." },
+  "B":              { symbol: "B",           desc: "Everything inside circle B (including the overlap with A)." },
+  "AinterB":        { symbol: "A \u2229 B",  desc: "The intersection \u2014 elements in BOTH A and B." },
+  "AunionB":        { symbol: "A \u222A B",  desc: "The union \u2014 elements in A OR B (or both)." },
+  "Acomp":          { symbol: "A\u2032",     desc: "The complement of A \u2014 everything NOT in A." },
+  "Bcomp":          { symbol: "B\u2032",     desc: "The complement of B \u2014 everything NOT in B." },
+  "AinterBcomp":    { symbol: "A \u2229 B\u2032", desc: "In A but NOT in B \u2014 the left-only part of circle A." },
+  "AcompinterB":    { symbol: "A\u2032 \u2229 B", desc: "In B but NOT in A \u2014 the right-only part of circle B." },
+  "AunionBcomp":    { symbol: "(A \u222A B)\u2032", desc: "NOT in A and NOT in B \u2014 outside both circles." },
+  "AinterBcompBig": { symbol: "(A \u2229 B)\u2032", desc: "NOT in the intersection \u2014 everything except the overlap." },
+};
+
+const allNotationKeys = Object.keys(notationInfo);
+
+// ============ TABS ============
+function switchTab(tabName) {
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tabName));
+  document.querySelectorAll(".section").forEach(s => s.classList.toggle("active", s.id === tabName));
+  if (tabName === "quiz" && !quizStarted) startQuiz();
+  if (tabName === "challenge" && !challengeStarted) startChallenge();
+}
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+});
+
+// ============ LEARN SECTION ============
+createVennSVG("learn-venn-intro");
+createVennSVG("learn-venn-example", {
+  showNumbers: true,
+  numbers: { aOnly: "12", intersection: "5", bOnly: "8", outside: "5" }
+});
+
+// ============ EXPLORE SECTION ============
+const exploreSvg = createVennSVG("explore-venn", { id: "explore" });
+
+document.querySelectorAll("#explore-buttons .region-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#explore-buttons .region-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const region = btn.dataset.region;
+    highlightByNotation(exploreSvg, region);
+    const info = notationInfo[region];
+    document.getElementById("explore-notation").textContent = info.symbol;
+    document.getElementById("explore-desc").textContent = info.desc;
+  });
+});
+
+// ============ QUIZ SECTION ============
+let quizStarted = false, quizScore = 0, quizTotal = 0, quizStreak = 0, quizBestStreak = 0;
+let quizMode = "shaded-to-notation";
+const QUIZ_LENGTH = 10;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function pickRandom(arr, n, exclude) {
+  return shuffle(arr.filter(x => x !== exclude)).slice(0, n);
+}
+
+document.querySelectorAll(".quiz-mode-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".quiz-mode-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    quizMode = btn.dataset.mode;
+    startQuiz();
+  });
+});
+
+function startQuiz() {
+  quizStarted = true; quizScore = 0; quizTotal = 0; quizStreak = 0; quizBestStreak = 0;
+  updateQuizUI(); nextQuizQ();
+}
+function updateQuizUI() {
+  document.getElementById("quiz-score").textContent = `Score: ${quizScore} / ${quizTotal}`;
+  document.getElementById("quiz-streak").textContent = quizStreak > 1 ? `Streak: ${quizStreak}` : "";
+  document.getElementById("quiz-progress").style.width = ((quizTotal / QUIZ_LENGTH) * 100) + "%";
+}
+
+function nextQuizQ() {
+  if (quizTotal >= QUIZ_LENGTH) { showQuizResults(); return; }
+  const content = document.getElementById("quiz-content");
+  const isN2S = quizMode === "notation-to-shading" || (quizMode === "mixed" && Math.random() > 0.5);
+  const correct = allNotationKeys[Math.floor(Math.random() * allNotationKeys.length)];
+  const correctInfo = notationInfo[correct];
+  const wrongs = pickRandom(allNotationKeys, 3, correct);
+  const options = shuffle([correct, ...wrongs]);
+
+  if (isN2S) {
+    content.innerHTML = `
+      <div class="quiz-question">Which diagram shows the shaded region for:</div>
+      <div class="quiz-prompt">${correctInfo.symbol}</div>
+      <div class="quiz-options">${options.map((n, i) => `<div class="quiz-option" data-notation="${n}" id="qo-${i}"><div id="qv-${i}" style="pointer-events:none"></div></div>`).join("")}</div>
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+      <button class="next-btn" id="quiz-next" disabled onclick="nextQuizQ()">Next &rarr;</button>`;
+    options.forEach((n, i) => {
+      const s = createVennSVG("qv-" + i, { width: 180, height: 125, id: "qv" + i + "-" + Date.now() });
+      highlightByNotation(s, n);
+      document.getElementById("qo-" + i).addEventListener("click", function() { handleQuizAns(n === correct, correctInfo.symbol, correct, this); });
+    });
+  } else {
+    content.innerHTML = `
+      <div class="quiz-question">What notation describes this shaded region?</div>
+      <div class="venn-container" id="qv-main"></div>
+      <div class="quiz-options">${options.map(n => `<button class="quiz-option" data-notation="${n}">${notationInfo[n].symbol}</button>`).join("")}</div>
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+      <button class="next-btn" id="quiz-next" disabled onclick="nextQuizQ()">Next &rarr;</button>`;
+    const s = createVennSVG("qv-main", { id: "qvm-" + Date.now() });
+    highlightByNotation(s, correct);
+    content.querySelectorAll(".quiz-option").forEach(btn => {
+      btn.addEventListener("click", function() { handleQuizAns(btn.dataset.notation === correct, correctInfo.symbol, correct, btn); });
+    });
+  }
+}
+
+function handleQuizAns(isCorrect, correctSymbol, correctKey, el) {
+  quizTotal++;
+  const fb = document.getElementById("quiz-feedback");
+  document.querySelectorAll("#quiz-content .quiz-option").forEach(o => {
+    o.classList.add("disabled");
+    if (o.dataset.notation === correctKey) o.classList.add("show-correct");
+  });
+  if (isCorrect) {
+    quizScore++; quizStreak++;
+    if (quizStreak > quizBestStreak) quizBestStreak = quizStreak;
+    el.classList.add("correct");
+    fb.textContent = "Correct!" + (quizStreak > 1 ? ` ${quizStreak} in a row!` : " Well done!");
+    fb.className = "quiz-feedback show correct";
+  } else {
+    quizStreak = 0;
+    el.classList.add("incorrect");
+    fb.textContent = `Not quite \u2014 the answer was ${correctSymbol}`;
+    fb.className = "quiz-feedback show incorrect";
+  }
+  updateQuizUI();
+  document.getElementById("quiz-next").disabled = false;
+}
+
+function showQuizResults() {
+  const pct = Math.round((quizScore / QUIZ_LENGTH) * 100);
+  let msg = pct === 100 ? "Perfect score! You've mastered Venn diagram notation!" :
+            pct >= 80 ? "Excellent work! You really know your notation!" :
+            pct >= 60 ? "Good effort! A bit more practice and you'll nail it." :
+            pct >= 40 ? "Not bad! Try the Explorer to review, then come back." :
+            "Keep practising! Go back to Learn and Explore to review.";
+  document.getElementById("quiz-content").innerHTML = `
+    <div class="results-card">
+      <div class="score-big">${quizScore}/${QUIZ_LENGTH}</div>
+      <div class="score-label">${pct}% correct</div>
+      <div class="results-message">${msg}</div>
+      ${quizBestStreak > 1 ? `<p style="color:var(--gray-500);margin-bottom:1rem;">Best streak: ${quizBestStreak} in a row</p>` : ""}
+      <button class="start-btn" onclick="startQuiz()">Try Again</button>
+    </div>`;
+  document.getElementById("quiz-progress").style.width = "100%";
+}
+
+// ============ CHALLENGE SECTION ============
+let challengeStarted = false, challengeScore = 0, challengeTotal = 0, challengeStreak = 0, challengeBestStreak = 0;
+let challengeTarget = null, challengeAnswered = false;
+const CHALLENGE_LENGTH = 10;
+
+// Notations with a single distinct click region (clearest for click challenge)
+const challengeNotations = ["AinterB", "AinterBcomp", "AcompinterB", "AunionBcomp"];
+const notationAcceptedClicks = {
+  "AinterB": ["intersection"],
+  "AinterBcomp": ["aOnly"],
+  "AcompinterB": ["bOnly"],
+  "AunionBcomp": ["outside"],
+};
+
+function startChallenge() {
+  challengeStarted = true; challengeScore = 0; challengeTotal = 0; challengeStreak = 0; challengeBestStreak = 0;
+  updateChallengeUI(); nextChallengeQ();
+}
+function updateChallengeUI() {
+  document.getElementById("challenge-score").textContent = `Score: ${challengeScore} / ${challengeTotal}`;
+  document.getElementById("challenge-streak").textContent = challengeStreak > 1 ? `Streak: ${challengeStreak}` : "";
+  document.getElementById("challenge-progress").style.width = ((challengeTotal / CHALLENGE_LENGTH) * 100) + "%";
+}
+
+function nextChallengeQ() {
+  if (challengeTotal >= CHALLENGE_LENGTH) { showChallengeResults(); return; }
+  challengeAnswered = false;
+  challengeTarget = challengeNotations[Math.floor(Math.random() * challengeNotations.length)];
+  document.getElementById("challenge-target").textContent = notationInfo[challengeTarget].symbol;
+  document.getElementById("challenge-feedback").className = "quiz-feedback";
+  document.getElementById("challenge-venn").innerHTML = "";
+  createVennSVG("challenge-venn", { interactive: true, id: "challenge", onClick: handleChallengeClick });
+}
+
+function handleChallengeClick(clickedRegion) {
+  if (challengeAnswered) return;
+  challengeAnswered = true;
+  challengeTotal++;
+  const accepted = notationAcceptedClicks[challengeTarget] || [];
+  const isCorrect = accepted.includes(clickedRegion);
+  const fb = document.getElementById("challenge-feedback");
+  const svg = document.querySelector("#challenge-svg");
+  if (svg) highlightByNotation(svg, challengeTarget);
+  if (isCorrect) {
+    challengeScore++; challengeStreak++;
+    if (challengeStreak > challengeBestStreak) challengeBestStreak = challengeStreak;
+    fb.textContent = "Correct! " + notationInfo[challengeTarget].desc;
+    fb.className = "quiz-feedback show correct";
+  } else {
+    challengeStreak = 0;
+    fb.textContent = "Not quite! " + notationInfo[challengeTarget].desc;
+    fb.className = "quiz-feedback show incorrect";
+  }
+  updateChallengeUI();
+  setTimeout(nextChallengeQ, 1800);
+}
+
+function showChallengeResults() {
+  const pct = Math.round((challengeScore / CHALLENGE_LENGTH) * 100);
+  let msg = pct === 100 ? "Incredible! You can read Venn diagrams like a pro!" :
+            pct >= 80 ? "Brilliant work! Nearly perfect!" :
+            pct >= 60 ? "Good going! Keep practising to get even better." :
+            "Try the Explorer to review the regions, then try again!";
+  document.getElementById("challenge-content").innerHTML = `
+    <div class="results-card">
+      <div class="score-big">${challengeScore}/${CHALLENGE_LENGTH}</div>
+      <div class="score-label">${pct}% correct</div>
+      <div class="results-message">${msg}</div>
+      ${challengeBestStreak > 1 ? `<p style="color:var(--gray-500);margin-bottom:1rem;">Best streak: ${challengeBestStreak} in a row</p>` : ""}
+      <button class="start-btn" onclick="document.getElementById('challenge-content').innerHTML='';challengeStarted=false;startChallenge();">Try Again</button>
+    </div>`;
+  document.getElementById("challenge-progress").style.width = "100%";
+}
+</script>
+</body>
+</html>
